@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bhuvan@redhat:~$ whoami</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Red Hat / Cyber Deck Theme */
+            --bg-primary: #0c0c0c;
+            --bg-secondary: #1a1a1a;
+            --bg-terminal: #000000;
+            --accent-red: #ee0000;
+            --accent-orange: #ff6600;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --text-green: #00ff00;
+            --text-cyan: #00ffff;
+            --text-yellow: #ffff00;
+            --border: #333333;
+            --shadow-red: 0 0 10px rgba(238, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px rgba(238, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Terminal Grid Background */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(238, 0, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(238, 0, 0, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: grid-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes grid-pulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Terminal Window Chrome */
+        .terminal-window {
+            background: var(--bg-terminal);
+            border: 2px solid var(--accent-red);
+            border-radius: 8px;
+            box-shadow: var(--shadow-glow);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: var(--bg-secondary);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .control-btn.close { background: #ff5f56; }
+        .control-btn.minimize { background: #ffbd2e; }
+        .control-btn.maximize { background: #27ca3f; }
+
+        .terminal-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        .terminal-content {
+            padding: 1rem;
+            background: var(--bg-terminal);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--bg-terminal);
+            border-bottom: 2px solid var(--accent-red);
+            z-index: 1000;
+            padding: 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 2rem;
+        }
+
+        .nav-prompt {
+            color: var(--accent-red);
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0;
+            margin: 0;
+        }
+
+        .nav-links li {
+            position: relative;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            display: block;
+            transition: all 0.2s ease;
+            border-left: 1px solid var(--border);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--accent-red);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-red);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 100px 2rem 2rem;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(238, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 102, 0, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-terminal {
+            background: var(--bg-terminal);
+            border: 2px solid var(--accent-red);
+            border-radius: 8px;
+            box-shadow: var(--shadow-glow);
+            padding: 0;
+        }
+
+        .boot-sequence {
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .boot-line {
+            margin: 0.2rem 0;
+            opacity: 0;
+            animation: boot-up 0.5s ease forwards;
+        }
+
+        .boot-line:nth-child(1) { animation-delay: 0.5s; }
+        .boot-line:nth-child(2) { animation-delay: 1s; }
+        .boot-line:nth-child(3) { animation-delay: 1.5s; }
+        .boot-line:nth-child(4) { animation-delay: 2s; }
+        .boot-line:nth-child(5) { animation-delay: 2.5s; }
+        .boot-line:nth-child(6) { animation-delay: 3s; }
+        .boot-line:nth-child(7) { animation-delay: 3.5s; }
+
+        @keyframes boot-up {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .prompt-line {
+            color: var(--accent-red);
+        }
+
+        .success { color: var(--text-green); }
+        .warning { color: var(--text-yellow); }
+        .info { color: var(--text-cyan); }
+        .error { color: var(--accent-red); }
+
+        .hero-info {
+            padding: 2rem;
+        }
+
+        .hero-info h1 {
+            font-size: 3rem;
+            color: var(--accent-red);
+            text-shadow: var(--shadow-red);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero-info .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-cyan);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .status-indicators {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-green);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cmd-btn {
+            background: var(--bg-terminal);
+            border: 2px solid var(--accent-red);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cmd-btn:hover {
+            background: var(--accent-red);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-red);
+            transform: translateY(-2px);
+        }
+
+        .cmd-btn.secondary {
+            border-color: var(--accent-orange);
+        }
+
+        .cmd-btn.secondary:hover {
+            background: var(--accent-orange);
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-red);
+            border-radius: 8px;
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .section-title {
+            background: var(--accent-red);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .section-subtitle {
+            padding: 1rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            background: var(--bg-terminal);
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .system-info {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-cyan);
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+        }
+
+        .skills-terminal {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .skill-category {
+            margin-bottom: 2rem;
+        }
+
+        .skill-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .skill-header {
+            color: var(--accent-red);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-list {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-left: 1.5rem;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-terminal {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .project-terminal:hover {
+            border-color: var(--accent-red);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-5px);
+        }
+
+        .project-header {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-title {
+            color: var(--text-cyan);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: var(--text-green);
+            color: var(--bg-terminal);
+        }
+
+        .status-ongoing {
+            background: var(--text-yellow);
+            color: var(--bg-terminal);
+        }
+
+        .status-award {
+            background: var(--accent-orange);
+            color: var(--text-primary);
+        }
+
+        .project-content {
+            padding: 1rem;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-tag {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        /* Achievements Section */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .achievement-item {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-red);
+            padding: 1.5rem;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-item:hover {
+            background: var(--bg-secondary);
+            transform: translateX(5px);
+        }
+
+        .achievement-title {
+            color: var(--text-cyan);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .achievement-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-terminal {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-icon {
+            color: var(--accent-red);
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .contact-info h4 {
+            color: var(--text-cyan);
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-info p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .contact-form {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-cyan);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 5px rgba(238, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 2px solid var(--accent-red);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Loading Animation */
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: var(--accent-red);
+            width: 0%;
+            animation: loading 3s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .about-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-terminal);
+                border-top: 1px solid var(--border);
+                flex-direction: column;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                border-left: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .hero-info h1 {
+                font-size: 2rem;
+            }
+
+            .status-indicators {
+                grid-template-columns: 1fr;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 2rem 1rem;
+            }
+
+            .nav-content {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-red);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-orange);
+        }
+
+        /* Cursor Animation */
+        .cursor {
+            display: inline-block;
+            background: var(--accent-red);
+            width: 2px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <span class="nav-prompt">root@bhuvan:~#</span>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="active">./home</a></li>
+                <li><a href="#about">./about</a></li>
+                <li><a href="#projects">./projects</a></li>
+                <li><a href="#achievements">./achievements</a></li>
+                <li><a href="#contact">./contact</a></li>
+            </ul>
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-terminal terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-controls">
+                        <button class="control-btn close"></button>
+                        <button class="control-btn minimize"></button>
+                        <button class="control-btn maximize"></button>
+                    </div>
+                    <span class="terminal-title">bhuvan@cybersec: ~</span>
+                </div>
+                <div class="boot-sequence">
+                    <div class="boot-line prompt-line">$ sudo systemctl start bhuvan.service</div>
+                    <div class="boot-line success">[✓] Starting Cybersecurity Specialist...</div>
+                    <div class="boot-line success">[✓] Loading Web Development Skills...</div>
+                    <div class="boot-line success">[✓] Initializing Robotics Systems...</div>
+                    <div class="boot-line success">[✓] Mounting Blockchain Knowledge...</div>
+                    <div class="boot-line warning">[!] ISRO Can Sat Project: STATUS ACTIVE</div>
+                    <div class="boot-line info">[i] Team Vikasana Leadership: ONLINE</div>
+                    <div class="boot-line prompt-line">$ whoami<span class="cursor"></span></div>
+                </div>
+            </div>
+
+            <div class="hero-info">
+                <h1>BHUVAN A</h1>
+                <div class="subtitle">// Cybersecurity Specialist & Innovation Leader</div>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.8;">
+                    COO & CTO at Team Vikasana | ISRO Can Sat Developer | 
+                    Ethical Hacker | Full-Stack Developer | Robotics Engineer
+                </p>
+
+                <div class="status-indicators">
+                    <div class="status-item">
+                        <div class="status-dot"></div>
+                        <span>System Status: OPERATIONAL</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot"></div>
+                        <span>Security Level: MAXIMUM</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot"></div>
+                        <span>Innovation Mode: ACTIVE</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot"></div>
+                        <span>Available for Hire: TRUE</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="#projects" class="cmd-btn">./view_projects.sh</a>
+                    <a href="#contact" class="cmd-btn secondary">./contact_me.sh</a>
+                    <a href="#about" class="cmd-btn">cat about.txt</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="section-header">
+            <h2 class="section-title">$ cat /home/bhuvan/about.txt</h2>
+            <div class="section-subtitle">System Information & Technical Specifications</div>
+        </div>
+
+        <div class="about-grid">
+            <div class="system-info terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-controls">
+                        <button class="control-btn close"></button>
+                        <button class="control-btn minimize"></button>
+                        <button class="control-btn maximize"></button>
+                    </div>
+                    <span class="terminal-title">System Information</span>
+                </div>
+                <div class="terminal-content">
+                    <div class="info-row">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value">Bhuvan A</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Role:</span>
+                        <span class="info-value">COO & CTO, Team Vikasana</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Education:</span>
+                        <span class="info-value">B.Tech CSE (Cybersecurity)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Institution:</span>
+                        <span class="info-value">Presidency University, Bangalore</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value">Bangalore, Karnataka, India</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Specialization:</span>
+                        <span class="info-value">Cybersecurity & Web Development</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Current Project:</span>
+                        <span class="info-value">ISRO Can Sat Competition</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value" id="uptime">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="skills-terminal terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-controls">
+                        <button class="control-btn close"></button>
+                        <button class="control-btn minimize"></button>
+                        <button class="control-btn maximize"></button>
+                    </div>
+                    <span class="terminal-title">Technical Arsenal</span>
+                </div>
+                <div class="terminal-content">
+                    <div class="skill-category">
+                        <div class="skill-header">
+                            <i class="fas fa-code"></i>
+                            Programming Languages
+                        </div>
+                        <div class="skill-list">
+                            Java, JavaScript, Python, C/C++, SQL, R, HTML/CSS
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <div class="skill-header">
+                            <i class="fas fa-globe"></i>
+                            Web Development Stack
+                        </div>
+                        <div class="skill-list">
+                            React.js, Node.js, Angular.js, PHP, REST APIs, XHTML
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <div class="skill-header">
+                            <i class="fas fa-shield-alt"></i>
+                            Cybersecurity Tools
+                        </div>
+                        <div class="skill-list">
+                            Kali Linux, Ethical Hacking, Penetration Testing, Security Analysis
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <div class="skill-header">
+                            <i class="fas fa-microchip"></i>
+                            Hardware & Robotics
+                        </div>
+                        <div class="skill-list">
+                            Arduino, ESP32/ESP8266, Raspberry Pi, IoT Development
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <div class="skill-header">
+                            <i class="fas fa-cube"></i>
+                            Blockchain & Web3
+                        </div>
+                        <div class="skill-list">
+                            Smart Contracts, DApp Development, Web3 Technologies
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <div class="skill-header">
+                            <i class="fas fa-tools"></i>
+                            Development Tools
+                        </div>
+                        <div class="skill-list">
+                            Git, VS Code, MATLAB, Arduino IDE, TinkerCAD, DevOps
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="section-header">
+            <h2 class="section-title">$ ls -la /home/bhuvan/projects/</h2>
+            <div class="section-subtitle">Active Development & Completed Systems</div>
+        </div>
+
+        <div class="projects-grid">
+            <!-- Can Sat Project -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">can_sat_isro/</span>
+                    <span class="project-status status-ongoing">ACTIVE</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Leading satellite systems development under IN-SPACe, ISRO. Working on communication 
+                        systems and payload integration for space missions. Key contributor in satellite 
+                        communication systems development.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">ISRO</span>
+                        <span class="tech-tag">Satellite Systems</span>
+                        <span class="tech-tag">IoT</span>
+                        <span class="tech-tag">Communication</span>
+                        <span class="tech-tag">Space Tech</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drone Object Detection -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">drone_yolo_detection/</span>
+                    <span class="project-status status-completed">DEPLOYED</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Integrated YOLOv8 and OpenCV for autonomous object detection with 95% success rate. 
+                        Preparing for NIDAR 2025 - India's largest drone innovation challenge in Delhi.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">YOLOv8</span>
+                        <span class="tech-tag">OpenCV</span>
+                        <span class="tech-tag">Computer Vision</span>
+                        <span class="tech-tag">Drone Tech</span>
+                        <span class="tech-tag">AI/ML</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arogya Seva -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">arogya_seva/</span>
+                    <span class="project-status status-award">5TH PLACE</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Multilingual Health Record Management System that secured 5th place in 
+                        Xinnovate 2024 Kerala Edition Hackathon. Features multi-language support 
+                        and advanced health data analytics.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Healthcare</span>
+                        <span class="tech-tag">NLP</span>
+                        <span class="tech-tag">Web App</span>
+                        <span class="tech-tag">React.js</span>
+                        <span class="tech-tag">Node.js</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INNOMAPS -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">innomaps_campus/</span>
+                    <span class="project-status status-completed">DEPLOYED</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Interactive campus mapping system for real-time event tracking and navigation 
+                        across university premises. Features real-time updates and location services.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Mapping API</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Real-time</span>
+                        <span class="tech-tag">Interactive</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Humanoid Robot -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">humanoid_robot_v2/</span>
+                    <span class="project-status status-completed">DEPLOYED</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Team Lead for humanoid robot development project focusing on autonomous 
+                        movement and interaction capabilities. Advanced servo control and AI integration.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Robotics</span>
+                        <span class="tech-tag">Arduino</span>
+                        <span class="tech-tag">Servo Control</span>
+                        <span class="tech-tag">AI Integration</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Home Automation -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">smart_home_system/</span>
+                    <span class="project-status status-completed">DEPLOYED</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Complete home automation system with IoT integration, voice control, 
+                        and mobile app interface. Features security monitoring and energy optimization.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">IoT</span>
+                        <span class="tech-tag">ESP32</span>
+                        <span class="tech-tag">Mobile App</span>
+                        <span class="tech-tag">Voice Control</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web3 DApps -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">web3_dapps/</span>
+                    <span class="project-status status-completed">DEPLOYED</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        Collection of decentralized applications built for various hackathons, 
+                        focusing on blockchain technology, smart contracts, and DeFi protocols.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Blockchain</span>
+                        <span class="tech-tag">Smart Contracts</span>
+                        <span class="tech-tag">Web3</span>
+                        <span class="tech-tag">DeFi</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cyber Rockerz -->
+            <div class="project-terminal">
+                <div class="project-header">
+                    <span class="project-title">cyber_rockerz_ott/</span>
+                    <span class="project-status status-completed">DEPLOYED</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">
+                        OTT Web Platform Clone with advanced streaming capabilities, user management, 
+                        and content delivery network integration. Full-featured video streaming platform.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Streaming</span>
+                        <span class="tech-tag">CDN</span>
+                        <span class="tech-tag">Full Stack</span>
+                        <span class="tech-tag">Video Processing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements" class="section">
+        <div class="section-header">
+            <h2 class="section-title">$ cat /var/log/achievements.log</h2>
+            <div class="section-subtitle">Leadership Roles, Awards & Recognition</div>
+        </div>
+
+        <div class="achievements-grid">
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-crown"></i>
+                    Current Leadership Position
+                </div>
+                <p class="achievement-description">
+                    <strong>COO & CTO</strong> at Team Vikasana - Student Research and Development Team 
+                    at Presidency University. Leading satellite systems development and innovation initiatives.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-trophy"></i>
+                    Hackathon Achievement
+                </div>
+                <p class="achievement-description">
+                    Secured <strong>5th place</strong> in Xinnovate 2024 Kerala Edition Hackathon for 
+                    Arogya Seva - Multilingual Health Record Management System project.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-rocket"></i>
+                    Space Technology Project
+                </div>
+                <p class="achievement-description">
+                    <strong>Key Contributor</strong> in ISRO Can Sat Competition - focused on satellite 
+                    communication systems development and integration.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-plane"></i>
+                    Innovation Challenge Participant
+                </div>
+                <p class="achievement-description">
+                    Participating in <strong>NIDAR 2025</strong> - India's largest drone innovation 
+                    challenge in Delhi, organized by the Drone Federation of India.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-users"></i>
+                    Event Organization
+                </div>
+                <p class="achievement-description">
+                    <strong>Lead Organizer</strong> of Innovetex 3.0 - National Level Tech Fest and 
+                    Bharat Drone Stack Conference 2025 at Bangalore International Exhibition Center.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    Research & Development
+                </div>
+                <p class="achievement-description">
+                    <strong>Core Member</strong> at BUILD CLUB (affiliated with IIT Madras Research Park) 
+                    and participated in Envision Conference 2025.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-certificate"></i>
+                    Professional Certifications
+                </div>
+                <p class="achievement-description">
+                    ISC2 Cybersecurity Certification, Level 1 Blockchain Developer, Computer Vision 101, 
+                    AI/ML Certifications, and multiple technical specializations.
+                </p>
+            </div>
+
+            <div class="achievement-item">
+                <div class="achievement-title">
+                    <i class="fas fa-microphone"></i>
+                    Research Contribution
+                </div>
+                <p class="achievement-description">
+                    <strong>SEED Project</strong> - Speech Analysis of L2 Learners Using Podcasts, 
+                    contributing to natural language processing and speech recognition research.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="section-header">
+            <h2 class="section-title">$ ./connect_with_bhuvan.sh</h2>
+            <div class="section-subtitle">Network Interfaces & Communication Protocols</div>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-terminal terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-controls">
+                        <button class="control-btn close"></button>
+                        <button class="control-btn minimize"></button>
+                        <button class="control-btn maximize"></button>
+                    </div>
+                    <span class="terminal-title">Network Interfaces</span>
+                </div>
+                <div class="terminal-content">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <div class="contact-info">
+                            <h4>Email Protocol</h4>
+                            <p>bhuvanofficial12@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-phone contact-icon"></i>
+                        <div class="contact-info">
+                            <h4>Voice Channel</h4>
+                            <p>+91 7019543882</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt contact-icon"></i>
+                        <div class="contact-info">
+                            <h4>Physical Location</h4>
+                            <p>Bangalore, Karnataka, India</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fab fa-linkedin contact-icon"></i>
+                        <div class="contact-info">
+                            <h4>Professional Network</h4>
+                            <p>LinkedIn Profile</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fab fa-github contact-icon"></i>
+                        <div class="contact-info">
+                            <h4>Code Repository</h4>
+                            <p>GitHub Portfolio</p>
+                        </div>
+                    </div>
+
+                    <div class="loading-bar">
+                        <div class="loading-progress"></div>
+                    </div>
+                    <p style="color: var(--text-green); font-size: 0.9rem; margin-top: 1rem;">
+                        [✓] All communication channels are SECURE and ENCRYPTED
+                    </p>
+                </div>
+            </div>
+
+            <div class="contact-form terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-controls">
+                        <button class="control-btn close"></button>
+                        <button class="control-btn minimize"></button>
+                        <button class="control-btn maximize"></button>
+                    </div>
+                    <span class="terminal-title">Send Message Protocol</span>
+                </div>
+                <div class="terminal-content">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Sender Identity:</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your name..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address:</label>
+                            <input type="email" id="email" name="email" placeholder="your.email@domain.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Message Subject:</label>
+                            <input type="text" id="subject" name="subject" placeholder="Brief subject line..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message Body:</label>
+                            <textarea id="message" name="message" rows="6" placeholder="Type your message here..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="cmd-btn" style="width: 100%;">
+                            ./send_message.sh
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="terminal-window" style="max-width: 800px; margin: 0 auto;">
+                <div class="terminal-header">
+                    <div class="terminal-controls">
+                        <button class="control-btn close"></button>
+                        <button class="control-btn minimize"></button>
+                        <button class="control-btn maximize"></button>
+                    </div>
+                    <span class="terminal-title">System Footer</span>
+                </div>
+                <div class="terminal-content" style="text-align: center;">
+                    <p style="color: var(--text-cyan); margin-bottom: 1rem;">
+                        root@bhuvan:~# echo "© 2025 Bhuvan A. All rights reserved."
+                    </p>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Secured by design • Powered by innovation • Built with Red Hat aesthetics
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                        "The best way to predict the future is to invent it." - Alan Kay
+                    </p>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <span style="color: var(--text-green);">System Status: </span>
+                        <span style="color: var(--text-primary);">ONLINE</span>
+                        <span style="color: var(--text-muted); margin: 0 1rem;">|</span>
+                        <span style="color: var(--text-green);">Last Updated: </span>
+                        <span style="color: var(--text-primary);" id="lastUpdated">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize the system
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSystem();
+        });
+
+        function initializeSystem() {
+            // Set up uptime counter
+            updateUptime();
+            setInterval(updateUptime, 1000);
+            
+            // Set last updated time
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            
+            // Initialize navigation
+            setupNavigation();
+            
+            // Initialize mobile menu
+            setupMobileMenu();
+            
+            // Setup form handling
+            setupContactForm();
+            
+            // Setup scroll animations
+            setupScrollAnimations();
+            
+            // Console welcome message
+            console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║    ██████╗ ██╗  ██╗██╗   ██╗██╗   ██╗ █████╗ ███╗   ██╗       ║
+║    ██╔══██╗██║  ██║██║   ██║██║   ██║██╔══██╗████╗  ██║       ║
+║    ██████╔╝███████║██║   ██║██║   ██║███████║██╔██╗ ██║       ║
+║    ██╔══██╗██╔══██║██║   ██║╚██╗ ██╔╝██╔══██║██║╚██╗██║       ║
+║    ██████╔╝██║  ██║╚██████╔╝ ╚████╔╝ ██║  ██║██║ ╚████║       ║
+║    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝   ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═══╝       ║
+║                                                                ║
+║              Cybersecurity Specialist & Innovation Leader     ║
+║                                                                ║
+║    System Status: ONLINE | Security Level: MAXIMUM            ║
+║    Contact: bhuvanofficial12@gmail.com                         ║
+║                                                                ║
+║    "Breaking barriers in cybersecurity, robotics & innovation"║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+            `);
+        }
+
+        function updateUptime() {
+            const startTime = new Date('2022-06-01'); // Assumed start of university
+            const now = new Date();
+            const diff = now - startTime;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            const uptimeElement = document.getElementById('uptime');
+            if (uptimeElement) {
+                uptimeElement.textContent = `${days}d ${hours}h ${minutes}m`;
+            }
+        }
+
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const sections = document.querySelectorAll('section[id]');
+            
+            // Smooth scrolling
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                    
+                    // Update active link
+                    navLinks.forEach(nl => nl.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close mobile menu if open
+                    document.getElementById('navLinks').classList.remove('active');
+                });
+            });
+
+            // Active section highlighting on scroll
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.offsetHeight;
+                    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        function setupMobileMenu() {
+            const mobileToggle = document.getElementById('mobileToggle');
+            const navLinks = document.getElementById('navLinks');
+            
+            mobileToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = mobileToggle.querySelector('i');
+                
+                if (navLinks.classList.contains('active')) {
+                    icon.className = 'fas fa-times';
+                } else {
+                    icon.className = 'fas fa-bars';
+                }
+            });
+        }
+
+        function setupContactForm() {
+            const form = document.getElementById('contactForm');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = new FormData(form);
+                const name = formData.get('name').trim();
+                const email = formData.get('email').trim();
+                const subject = formData.get('subject').trim();
+                const message = formData.get('message').trim();
+                
+                // Validate form
+                if (!name || !email || !subject || !message) {
+                    showNotification('Error: All fields are required', 'error');
+                    return;
+                }
+                
+                if (!isValidEmail(email)) {
+                    showNotification('Error: Invalid email address', 'error');
+                    return;
+                }
+                
+                // Simulate form submission
+                const submitBtn = form.querySelector('.cmd-btn');
+                const originalText = submitBtn.textContent;
+                
+                submitBtn.textContent = '$ Processing...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    showNotification('Message sent successfully! Response expected within 24hrs.', 'success');
+                    form.reset();
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 2000);
+            });
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--text-green)' : 'var(--accent-red)'};
+                color: var(--bg-terminal);
+                padding: 1rem 2rem;
+                border-radius: 4px;
+                font-family: 'Fira Code', monospace;
+                font-weight: 500;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 5000);
+        }
+
+        function setupScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(section);
+            });
+        }
+
+        // Add CSS animations dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                }
+                to { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                }
+            }
+            
+            @keyframes slideOut {
+                from { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                }
+                to { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Easter eggs and additional interactions
+        let konami = [];
+        const konamiCode = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'KeyB', 'KeyA'
+        ];
+
+        document.addEventListener('keydown', (e) => {
+            konami.push(e.code);
+            if (konami.length > konamiCode.length) {
+                konami.shift();
+            }
+            
+            if (konami.length === konamiCode.length &&
+                konami.every((code, index) => code === konamiCode[index])) {
+                activateEasterEgg();
+            }
+        });
+
+        function activateEasterEgg() {
+            document.body.style.filter = 'hue-rotate(120deg)';
+            showNotification('🎯 KONAMI CODE ACTIVATED! Elite hacker mode enabled!', 'success');
+            
+            setTimeout(() => {
+                document.body.style.filter = 'none';
+            }, 10000);
+        }
+
+        // Terminal typing effect for hero section
+        function startTypingEffect() {
+            const cursor = document.querySelector('.cursor');
+            if (cursor) {
+                cursor.style.display = 'inline-block';
+            }
+        }
+
+        // Initialize typing effect after page load
+        window.addEventListener('load', () => {
+            setTimeout(startTypingEffect, 3500);
+        });
+    </script>
+</body>
+</html>
